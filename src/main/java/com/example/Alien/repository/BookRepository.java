@@ -1,8 +1,10 @@
 package com.example.Alien.repository;
 
 import java.util.ArrayList;
-import com.example.Alien.model.Publisher;
+import java.util.List;
 
+import com.example.Alien.model.Publisher;
+import com.example.Alien.model.Author;
 import com.example.Alien.model.Book;
 
 public interface BookRepository {
@@ -17,5 +19,7 @@ public interface BookRepository {
     void deleteBook(int bookId);
 
     Publisher getBookPublisher(int bookId);
+
+    List<Author> getBookAuthors(int bookId); 
 
 }

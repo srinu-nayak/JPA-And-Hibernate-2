@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.Alien.model.Author;
 import com.example.Alien.model.Book;
 import com.example.Alien.model.Publisher;
+import com.example.Alien.repository.AuthorJpaRepository;
 import com.example.Alien.repository.BookJpaRepository;
 import com.example.Alien.repository.BookRepository;
 import com.example.Alien.repository.PublisherJpaRepository;
@@ -22,6 +24,9 @@ public class BookJpaService implements BookRepository{
 
     @Autowired
     PublisherJpaRepository publisherJpaRepository;
+
+    @Autowired
+    AuthorJpaRepository authorJpaRepository;
 
     @Override
     public ArrayList<Book> getBooks() {
@@ -44,18 +49,31 @@ public class BookJpaService implements BookRepository{
 
     @Override
     public Book addBook(Book book) {
+        List<Integer> authodIds = new ArrayList<>();
+       for (Author author: book.getAuthors()) {
+        authodIds.add(author.getAuthorId());
+       }
+
        Publisher publisher = book.getPublisher();
        int publisherId = publisher.getPublisherId();
        try {
+        List<Author> completeAuthors = authorJpaRepository.findAllById(authodIds);
+       if(authodIds.size() != completeAuthors.size()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "one or more author ids not found");
+       }
+       book.setAuthors(completeAuthors);
+
+
         Publisher completePublisher = publisherJpaRepository.findById(publisherId).get();
         book.setPublisher(completePublisher);
         bookJpaRepository.save(book);
         return book;
        }
-       catch(Exception e) {
+       catch(NoSuchElementException e) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "potentially wrong publisherId");
        }
     }
+
 
     @Override
     public Book updateBook(int bookId, Book book) {
@@ -104,4 +122,16 @@ public class BookJpaService implements BookRepository{
         }
     }
 
+    @Override
+    public List<Author> getBookAuthors(int bookId) {
+        try {
+            Book book = bookJpaRepository.findById(bookId).get();
+            return book.getAuthors();
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    
 }

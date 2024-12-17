@@ -6,9 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import com.example.Alien.model.Publisher;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity
 @Table(name = "book")
@@ -29,14 +36,27 @@ public class Book {
     @JoinColumn(name="publisherid")
     private Publisher publisher;
 
-    public Book() {}
 
-    public Book(int id, String name, String imageUrl, Publisher publisher) {
+    @ManyToMany
+    @JoinTable(
+        name = "book_author",
+        joinColumns = @JoinColumn(name="bookid"),
+        inverseJoinColumns = @JoinColumn(name = "authorid")
+    )
+
+    @JsonIgnoreProperties("books")
+    private List<Author> authors = new ArrayList<>();
+
+    public Book(int id, String name, String imageUrl, Publisher publisher, List<Author> authors) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
         this.publisher = publisher;
+        this.authors = authors;
     }
+
+
+    public Book() {}
 
     public int getId() {
         return id;
@@ -70,8 +90,13 @@ public class Book {
         this.publisher = publisher;
     }
 
-    
-    
+    public List<Author> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<Author> authors) {
+        this.authors = authors;
+    }
 
 
 }

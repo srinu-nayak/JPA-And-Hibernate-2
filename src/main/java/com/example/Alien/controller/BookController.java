@@ -1,6 +1,7 @@
 package com.example.Alien.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.Alien.model.Author;
 import com.example.Alien.model.Book;
 import com.example.Alien.model.Publisher;
 import com.example.Alien.service.BookJpaService;
@@ -50,5 +52,12 @@ public class BookController {
     public Publisher getBookPublisher(@PathVariable(name="bookId") int bookId) {
         return bookJpaService.getBookPublisher(bookId);
     }
+
+    @GetMapping("/books/{bookId}/authors") 
+    public List<Author> getBookAuthors(@PathVariable int bookId) {
+        return bookJpaService.getBookAuthors(bookId);
+    }
+
+
 
 }
